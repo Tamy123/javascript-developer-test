@@ -32,7 +32,7 @@ const getArnieQuotes = async (urls) => {
   const quoteRequests = urls.map(url => fetchQuote(url));
   
   // Wait for all requests to complete and return results
-  const results = Promise.all(quoteRequests);
+  const results = await Promise.all(quoteRequests);
   return results;
 };
 
