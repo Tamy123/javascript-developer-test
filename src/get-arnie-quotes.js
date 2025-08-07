@@ -8,6 +8,7 @@ const { httpGet } = require('./mock-http-interface');
 const fetchQuote = async (url) => {
   try {
     const response = await httpGet(url);
+    // Parse the JSON body since it's returned as a string
     const { message } = JSON.parse(response.body);
     
     // Return success or failure object based on status code
