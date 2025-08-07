@@ -1,34 +1,38 @@
 const { httpGet } = require('./mock-http-interface');
 
+/**
+ * Fetches a quote from a single URL and formats the response
+ * @param {string} url - URL to fetch the quote from
+ * @returns {Promise<Object>} Formatted quote object
+ */
+const fetchQuote = async (url) => {
+  try {
+    const response = await httpGet(url);
+    const { message } = JSON.parse(response.body);
+    
+    // Return success or failure object based on status code
+    return response.status === 200
+      ? { 'Arnie Quote': message }
+      : { 'FAILURE': message };
+      
+  } catch (error) {
+    // Handle any unexpected errors as failures
+    return { 'FAILURE': error.message || 'Request failed' };
+  }
+};
+
+/**
+ * Executes HTTP GET requests on multiple URLs and returns Arnie quotes
+ * @param {string[]} urls - Array of URLs to request
+ * @returns {Promise<Object[]>} Promise resolving to array of quote results
+ */
 const getArnieQuotes = async (urls) => {
-  // Create an array of promises for all HTTP requests
-  const promises = urls.map(async (url) => {
-    try {
-      const response = await httpGet(url);
-      
-      // Parse the JSON body since it's returned as a string
-      const body = JSON.parse(response.body);
-      
-      if (response.status === 200) {
-        return {
-          "Arnie Quote": body.message
-        };
-      } else {
-        return {
-          "FAILURE": body.message
-        };
-      }
-    } catch (error) {
-      // Handle any errors that might occur
-      return {
-        "FAILURE": error.message || "Request failed"
-      };
-    }
-  });
+  // Process all URLs in parallel for better performance under 400ms
+  const quoteRequests = urls.map(url => fetchQuote(url));
   
-  // Wait for all promises to resolve and return the results
-  const results = await Promise.all(promises);
-  return results;
+  // Wait for all requests to complete and return results
+  const results = Promise.all(quoteRequests);
+  return results
 };
 
 module.exports = {
