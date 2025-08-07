@@ -33,7 +33,7 @@ const getArnieQuotes = async (urls) => {
   
   // Wait for all requests to complete and return results
   const results = Promise.all(quoteRequests);
-  return results
+  return results;
 };
 
 module.exports = {
